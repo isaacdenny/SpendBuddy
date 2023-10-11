@@ -19,11 +19,64 @@ namespace SpendBuddy
                 var seed = new Seed(_context);
                 seed.SeedDataContext();
             }
-
-            WriteLogs();
-            AddLog();
-            WriteLogs();
+            string input = "m";
+            while (input != "q")
+            {
+                switch(input)
+                {
+                    case "m":
+                        ShowMenu();
+                        break;
+                    case "s":
+                        WriteLogs();
+                        break;
+                    case "a":
+                        AddLog();
+                        break;
+                    case "d":
+                        DeleteLog();
+                        break;
+                    case "i":
+                        ImportLogs();
+                        break;
+                    default: 
+                        break;
+                }
+                Console.Write("sb control >> ");
+                input = Console.ReadLine().ToLower();
+            }
         }
+
+        private static void ImportLogs()
+        {
+            Console.WriteLine("*** Import Logs From CSV ***");
+            Console.Write("Path to file: ");
+            string filePath = Path.GetFullPath(Console.ReadLine());
+
+            try
+            {
+                using(var sr = new StreamReader(filePath))
+                {
+                    Console.WriteLine(sr.ReadToEnd());
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("Error: File not found");
+            }
+        }
+
+        private static void ShowMenu()
+        {
+            Console.WriteLine("*** Menu ***\n");
+            Console.WriteLine("[S]how logs");
+            Console.WriteLine("[A]dd log");
+            Console.WriteLine("[D]elete log");
+            Console.WriteLine("[I]mport logs from csv");
+            Console.WriteLine("[E]xport logs to csv");
+            Console.WriteLine();
+        }
+
         static void GetDataContext()
         {
             var builder = new ConfigurationBuilder()
@@ -38,10 +91,18 @@ namespace SpendBuddy
         {
             var lr = new LogRepository(_context);
             var logs = lr.GetLogs();
+
+            double total = 0;
+            Console.WriteLine();
+            Console.WriteLine("{0,10}{1,10}{2,20}{3,10}","ID","Date","Description","Cost");
             foreach (var l in logs)
             {
-                Console.WriteLine(l.ID + "    " + l.Description + "    " + l.Cost);
+                total += l.Cost;
+                Console.WriteLine("{0,10}{1,10}{2,20}{3,10}", l.ID, l.DateCharged.Month + "/" + l.DateCharged.Day, l.Description,"$" + l.Cost);
             }
+            Console.WriteLine();
+            Console.WriteLine("{0,50}", "Total: $" + total);
+            Console.WriteLine();
         }
 
         static void AddLog()
@@ -67,13 +128,20 @@ namespace SpendBuddy
             };
             lr.AddLog(log);
             Console.WriteLine("Added New Log");
+            Console.WriteLine();
         }
 
-        static void DeleteLog(int id)
+        static void DeleteLog()
         {
+            Console.WriteLine("*** Delete a log ***\n");
+            Console.Write("ID of log to delete: ");
+            int id = Convert.ToInt16(Console.ReadLine());
+
             var lr = new LogRepository(_context);
             int num = lr.DeleteLog(id);
+
             Console.WriteLine("Deleted: " + num + " logs");
+            Console.WriteLine();
         }
     }
 }
