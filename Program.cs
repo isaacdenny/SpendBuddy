@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using SpendBuddy.Data;
 using SpendBuddy.Models;
 using SpendBuddy.Repositories;
+using Spectre.Console;
 
 namespace SpendBuddy
 {
@@ -22,7 +23,7 @@ namespace SpendBuddy
             string input = "m";
             while (input != "q")
             {
-                switch(input)
+                switch (input)
                 {
                     case "m":
                         ShowMenu();
@@ -39,10 +40,10 @@ namespace SpendBuddy
                     case "i":
                         ImportLogs();
                         break;
-                    default: 
+                    default:
                         break;
                 }
-                Console.Write("sb control >> ");
+                AnsiConsole.Markup("[underline red]sb control[/] >> ");
                 input = Console.ReadLine().ToLower();
             }
         }
@@ -55,7 +56,7 @@ namespace SpendBuddy
 
             try
             {
-                using(var sr = new StreamReader(filePath))
+                using (var sr = new StreamReader(filePath))
                 {
                     Console.WriteLine(sr.ReadToEnd());
                 }
@@ -84,7 +85,8 @@ namespace SpendBuddy
                                  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _config = builder.Build();
 
-            var options = new DbContextOptionsBuilder<DataContext>().UseSqlServer(_config.GetConnectionString("DefaultConnection")).Options;
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 34));
+            var options = new DbContextOptionsBuilder<DataContext>().UseMySql(_config.GetConnectionString("MYSQLConnection"), serverVersion).Options;
             _context = new DataContext(options);
         }
         static void WriteLogs()
@@ -94,11 +96,11 @@ namespace SpendBuddy
 
             double total = 0;
             Console.WriteLine();
-            Console.WriteLine("{0,10}{1,10}{2,20}{3,10}","ID","Date","Description","Cost");
+            Console.WriteLine("{0,10}{1,10}{2,20}{3,10}{4,10}", "ID", "Date", "Description", "Cost", "Category");
             foreach (var l in logs)
             {
                 total += l.Cost;
-                Console.WriteLine("{0,10}{1,10}{2,20}{3,10}", l.ID, l.DateCharged.Month + "/" + l.DateCharged.Day, l.Description,"$" + l.Cost);
+                Console.WriteLine("{0,10}{1,10}{2,20}{3,10}{4,10}", l.ID, l.DateCharged.Month + "/" + l.DateCharged.Day, l.Description, "$" + l.Cost, l.Category.ToString());
             }
             Console.WriteLine();
             Console.WriteLine("{0,50}", "Total: $" + total);

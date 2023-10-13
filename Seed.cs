@@ -21,22 +21,25 @@ namespace SpendBuddy
                     {
                         Description = "Walmart",
                         DateAdded = DateTime.Now,
-                        DateCharged = DateTime.Now,
-                        Cost = 100,
+                        DateCharged = Convert.ToDateTime("10/03/2023"),
+                        Cost = 120.00,
+                        Category = Category.GROCERY
                     },
                     new Log
                     {
                         Description = "Gas",
                         DateAdded = DateTime.Now,
-                        DateCharged = DateTime.Now,
-                        Cost = 109,
+                        DateCharged = Convert.ToDateTime("10/04/2023"),
+                        Cost = 109.00,
+                        Category = Category.GAS
                     },
                     new Log
                     {
-                        Description = "Food",
+                        Description = "Chickfila",
                         DateAdded = DateTime.Now,
-                        DateCharged = DateTime.Now,
-                        Cost = 22
+                        DateCharged = Convert.ToDateTime("10/05/2023"),
+                        Cost = 22.00,
+                        Category = Category.OTE
                     }
                 };
                 _context.Logs.AddRange(logs);

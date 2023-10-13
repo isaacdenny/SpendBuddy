@@ -19,7 +19,8 @@ namespace SpendBuddy.Data
                                  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _config = builder.Build();
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-            optionsBuilder.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 34));
+            optionsBuilder.UseMySql(_config.GetConnectionString("MYSQLDevConnection"), serverVersion);
 
             return new DataContext(optionsBuilder.Options);
         }
